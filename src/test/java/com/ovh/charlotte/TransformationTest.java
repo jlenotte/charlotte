@@ -139,6 +139,8 @@ public class TransformationTest
                 .reduce(0,
                         (a, b) -> a + b);
 
+        System.out.println("hi");
+
         // Groupage par Noms de famille des clients
         Map<String, List<Client>> sumAll = list.stream()
                 .collect(Collectors.groupingBy(Client::getNom));
