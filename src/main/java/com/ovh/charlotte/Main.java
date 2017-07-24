@@ -4,10 +4,6 @@ public class Main
 {
     public static void main(String[] args)
     {
-//        DataGeneration.randomDateGeneration();
-//        DataGeneration.randomAmountGeneration();
-//        FileAccess fa = new FileAccess();
-//        DataGeneration.generateTime();
-//        FileAccess.displayAmountsByDate();
+        System.out.println("Welcome to projet Charlotte : Apache Flink learning.");
     }
 }
