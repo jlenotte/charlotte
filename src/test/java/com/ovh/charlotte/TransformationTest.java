@@ -102,19 +102,26 @@ public class TransformationTest
         // Initialisation liste
         // ----------------------------------------------------------------------------------------------/
         ArrayList<Client> list = new ArrayList<>();
-        CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-        String[] nextLine;
 
-        while ((nextLine = reader.readNext()) != null)
+        try
         {
-            System.out.println(nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-            String nom = nextLine[0];
-            String prenom = nextLine[1];
-            double montant = Double.parseDouble(nextLine[2]);
-            ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
+            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
+            String[] nextLine;
 
-            Client c = new Client(nom, prenom, montant, date);
-            list.add(c);
+            while ((nextLine = reader.readNext()) != null)
+            {
+                System.out.println(nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
+                String nom = nextLine[0];
+                String prenom = nextLine[1];
+                double montant = Double.parseDouble(nextLine[2]);
+                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
+
+                Client c = new Client(nom, prenom, montant, date);
+                list.add(c);
+            }
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
         }
 
         // Opérations sur les données
@@ -127,9 +134,9 @@ public class TransformationTest
 
         // Aggregation de la somme de tous les montant de Luann Gudger en 2016
         double sum = list.stream()
-                .filter(client -> client.getDate().getYear() == 2016)
-                .filter(client -> client.getNom().equals("Gudger"))
-                .filter(client -> client.getPrenom().equals("Luann"))
+                .filter(client -> client.getDate().getYear() == 2012)
+                .filter(client -> client.getNom().equals("Vital"))
+                .filter(client -> client.getPrenom().equals("Onita"))
                 .mapToDouble(Client::getMontant)
                 .sum();
 
@@ -145,14 +152,19 @@ public class TransformationTest
         Map<String, List<Client>> sumAll = list.stream()
                 .collect(Collectors.groupingBy(Client::getNom));
 
-        // Affichage
+        // Affichage 1
         for (Client cc : result)
         {
             System.out.println(cc);
         }
-        System.out.println("sum : " + sum);
+
+        // Affichage 2
+        System.out.println("Sum of all transactions from 'Vital Onita in 2012' : " + sum);
+
+        // Affichage 3
         System.out.println("reduce : " + sumReduce);
 
+        // Affichage 4
         for (Map.Entry<String, List<Client>> ccc : sumAll.entrySet())
         {
             System.out.println(ccc);

@@ -27,7 +27,7 @@ public class DataBaseWriteTest
             FileWriter fw = new FileWriter(f, false);
             BufferedWriter bw = new BufferedWriter(fw);
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 5000; i++)
             {
                 // Attributs clients
                 String nom = String.valueOf(Noms.getRandomName());
