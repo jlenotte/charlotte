@@ -3,12 +3,16 @@ package com.ovh.charlotte;
 import com.opencsv.CSVReader;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertTrue;
 
 public class TransformationTest
 {
@@ -55,8 +59,7 @@ public class TransformationTest
         }
     }
 
-    @Test
-    public void streamingJobs() throws IOException
+    public static void streamingJobs() throws IOException
     {
         // Initialisation liste
         // ----------------------------------------------------------------------------------------------/
@@ -98,6 +101,8 @@ public class TransformationTest
                 .filter(client -> client.getPrenom().equals("Will"))
                 .mapToDouble(Client::getMontant)
                 .sum();
+        assertTrue(list.isEmpty() == false);
+        assertTrue("Client must match the search.", true);
 
         // Reduce du montant des transactions des clients
         double sumReduce = list.stream()
@@ -113,7 +118,6 @@ public class TransformationTest
         List<Client> toplist;
         Comparator<Client> comp = (Client c1, Client c2) -> c1.getMontant().compareTo(c2.getMontant());
         list.sort(comp.reversed());
-
 
         // Affichage 1
         for (Client cc : result)
