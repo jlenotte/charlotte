@@ -39,7 +39,7 @@ public class DataBaseWriteTest
                 long l = min + (long) (Math.random() * (max - min));
                 Instant instant = Instant.ofEpochMilli(l);
                 ZonedDateTime date = ZonedDateTime.ofInstant(instant, UTC_ZONE_ID);
-                double montant = ThreadLocalRandom.current().nextDouble(-500000, 1000000 + 1);
+                double montant = ThreadLocalRandom.current().nextDouble(-50000, 1000000 + 1);
 
                 // Generation client & ajout dans ArrayList
                 Client c = new Client(nom, prenom, montant, date);

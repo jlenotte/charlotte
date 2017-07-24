@@ -134,9 +134,9 @@ public class TransformationTest
 
         // Aggregation de la somme de tous les montant de Luann Gudger en 2016
         double sum = list.stream()
-                .filter(client -> client.getDate().getYear() == 2012)
+//                .filter(client -> client.getDate().getYear() == 2012)
                 .filter(client -> client.getNom().equals("Vital"))
-                .filter(client -> client.getPrenom().equals("Onita"))
+                .filter(client -> client.getPrenom().equals("Lottie"))
                 .mapToDouble(Client::getMontant)
                 .sum();
 
@@ -161,7 +161,7 @@ public class TransformationTest
         }
 
         // Affichage 2
-        System.out.println("Sum of all transactions from 'Vital Onita in 2012' : " + sum);
+        System.out.println("Sum of all transactions from 'Vital Lottie' : " + sum);
 
         // Affichage 3
         System.out.println("reduce : " + sumReduce);
