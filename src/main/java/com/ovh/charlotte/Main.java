@@ -1,12 +1,11 @@
 package com.ovh.charlotte;
 
+import java.io.IOException;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-
-import java.io.IOException;
 
 public class Main
 {
@@ -14,7 +13,8 @@ public class Main
     {
 
         System.out.println("Welcome to projet Charlotte - Learning Apache Flink & Maven deployments");
-        //TransformationTest.streamingJobs();
+//        TransformationTest.flinklessStreamingJobs();
+
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
         DataSet<String> text = env.readTextFile("/path/to/file");

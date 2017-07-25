@@ -25,7 +25,8 @@ public class Client
         this.nom = nom;
         this.prenom = prenom;
         this.montant = montant;
-//
+        this.date = date;
+
 //        ZoneId UTC_TIME_ZONE = ZoneId.of("UTC");
 //        Random rand = new Random();
 //        long now = System.currentTimeMillis();
@@ -36,7 +37,6 @@ public class Client
 //        Instant instant = Instant.ofEpochMilli(x);
 //        date = ZonedDateTime.ofInstant(instant, UTC_TIME_ZONE);
 //        System.out.println(DateTimeFormatter.ofPattern("yyyy/MM/dd - hh:mm").format(date));
-        this.date = date;
     }
 
     // Methods
