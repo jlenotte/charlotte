@@ -9,10 +9,11 @@ import org.apache.flink.util.Collector;
 
 public class Main
 {
+
     public static void main(String[] args, String outputPath) throws IOException
     {
-
-        System.out.println("Welcome to projet Charlotte - Learning Apache Flink & Maven deployments");
+        System.out
+            .println("Welcome to projet Charlotte - Learning Apache Flink & Maven deployments");
 //        TransformationTest.flinklessStreamingJobs();
 
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -20,11 +21,11 @@ public class Main
         DataSet<String> text = env.readTextFile("/path/to/file");
 
         DataSet<Tuple2<String, Integer>> counts =
-                // split up the lines in pairs (2-tuples) containing: (word,1)
-                text.flatMap(new Tokenizer())
-                        // group by the tuple field "0" and sum up tuple field "1"
-                        .groupBy(0)
-                        .sum(1);
+            // split up the lines in pairs (2-tuples) containing: (word,1)
+            text.flatMap(new Tokenizer())
+                // group by the tuple field "0" and sum up tuple field "1"
+                .groupBy(0)
+                .sum(1);
 
         counts.writeAsCsv(outputPath, "\n", " ");
 

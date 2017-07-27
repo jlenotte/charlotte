@@ -4,12 +4,24 @@ import java.time.ZonedDateTime;
 
 public class Client
 {
+
     // Attributes
     private String nom = String.valueOf(Noms.getRandomName());
     private String prenom = String.valueOf(Prenoms.getRandomName());
     private ZonedDateTime date;
     private Double montant;
 
+    @Override
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        return super.equals(o);
+    }
 
     // Constructor
     public Client()
@@ -62,6 +74,7 @@ public class Client
 
     public String toString()
     {
-        return "[Client]" + "Nom: " + nom + ", Prenom: " + prenom + ", Montant: " + montant + ", Date: " + date + "\n";
+        return "[Client]" + "Nom: " + nom + ", Prenom: " + prenom + ", Montant: " + montant
+            + ", Date: " + date + "\n";
     }
 }

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
@@ -112,9 +113,9 @@ public class LambdaTest
         // TRAITEMENT
 
         double sum = list.stream()
-            .filter(client -> client.getDate().getYear() == 2012)
-            .filter(client -> client.getNom().equals("Patel"))
-            .filter(client -> client.getPrenom().equals("Will"))
+            .filter(client -> client.getDate().getYear() == 2013)
+            .filter(client -> client.getNom().equals("Natali"))
+            .filter(client -> client.getPrenom().equals("Jules"))
             .mapToDouble(Client::getMontant)
             .sum();
         assertTrue(!list.isEmpty());
@@ -202,15 +203,67 @@ public class LambdaTest
         //------------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        Map<String, List<Client>> sumAll = list.stream()
-            .collect(Collectors.groupingBy(Client::getNom));
+        Map<ZonedDateTime, List<Client>> sumAll = list.stream()
+            .filter(client -> client.getDate().getYear() == 2013)
+            .filter(client -> client.getDate().getMonthValue() == 6)
+            .filter(client -> client.getNom().equals("Vital"))
+            .filter(client -> client.getPrenom().equals("Oda"))
+            .distinct()
+            .collect(Collectors.groupingBy(Client::getDate));
 
         // Affichage
-        System.out.println("\n ///// GROUPBY : NOMS DE FAMILLE /////");
-        for (Map.Entry<String, List<Client>> ccc : sumAll.entrySet())
+        System.out.println("\n ///// GROUPBY /////");
+        for (Entry<ZonedDateTime, List<Client>> ccc : sumAll.entrySet())
         {
             System.out.println(ccc);
         }
+        System.out.println("\n ///// GROUPBY /////");
+        System.out.println(sumAll);
+    }
+
+    @Test
+    public void monthlySum() throws IOException
+    {
+        //------------------------------------------------------------------------------------------------//
+        // OUVERTURE FICHIER
+
+        ArrayList<Client> list = new ArrayList<>();
+
+        try
+        {
+            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
+            String[] nextLine;
+
+            while ((nextLine = reader.readNext()) != null)
+            {
+                System.out.println(
+                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
+                String nom = nextLine[0];
+                String prenom = nextLine[1];
+                double montant = Double.parseDouble(nextLine[2]);
+                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
+
+                Client c = new Client(nom, prenom, montant, date);
+                list.add(c);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        //------------------------------------------------------------------------------------------------//
+        // TRAITEMENT
+
+        double sum = list.stream()
+            .filter(client -> client.getDate().getYear() == 2013)
+            .filter(client -> client.getDate().getMonthValue() == 6)
+            .filter(client -> client.getNom().equals("Vital"))
+            .filter(client -> client.getPrenom().equals("Oda"))
+            .mapToDouble(Client::getMontant)
+            .sum();
+
+        System.out.println("\n" + "TOTAL TRANSACTIONS DE 'VITAL ODA' POUR JUIN 2013" + sum);
     }
 
     @Test
@@ -255,6 +308,7 @@ public class LambdaTest
             montant = c.getMontant();
             toplist.add(montant);
         }
+
         Collections.sort(toplist, Collections.reverseOrder());
 
         // Affichage
@@ -346,19 +400,124 @@ public class LambdaTest
 
         list.stream()
             .sorted(byMontant.thenComparing(byName))
+//            .map(Client::getDate)
             .forEach(System.out::println);
     }
 
     @Test
     public void yyyyMmGlobalTest() throws IOException
     {
+        //------------------------------------------------------------------------------------------------//
+        // OUVERTURE FICHIER
 
+        ArrayList<Client> list = new ArrayList<>();
+
+        try
+        {
+            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
+            String[] nextLine;
+
+            while ((nextLine = reader.readNext()) != null)
+            {
+                System.out.println(
+                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
+                String nom = nextLine[0];
+                String prenom = nextLine[1];
+                double montant = Double.parseDouble(nextLine[2]);
+                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
+
+                Client c = new Client(nom, prenom, montant, date);
+                list.add(c);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        //------------------------------------------------------------------------------------------------//
+        // TRAITEMENT
     }
 
     @Test
     public void yyyyMmNomTest() throws IOException
     {
+        //------------------------------------------------------------------------------------------------//
+        // OUVERTURE FICHIER
 
+        ArrayList<Client> list = new ArrayList<>();
+
+        try
+        {
+            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
+            String[] nextLine;
+
+            while ((nextLine = reader.readNext()) != null)
+            {
+                System.out.println(
+                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
+                String nom = nextLine[0];
+                String prenom = nextLine[1];
+                double montant = Double.parseDouble(nextLine[2]);
+                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
+
+                Client c = new Client(nom, prenom, montant, date);
+                list.add(c);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        //------------------------------------------------------------------------------------------------//
+        // TRAITEMENT
+
+//        Map<ZonedDateTime, List<Client>> dateList = list.stream()
+//            .collect(Collectors.groupingBy(client -> client), Collectors.groupingBy(Client::getNom))
+
+    }
+
+    @Test
+    public void flatMapTest() throws IOException
+    {
+        //------------------------------------------------------------------------------------------------//
+        // OUVERTURE FICHIER
+
+        ArrayList<Client> list = new ArrayList<>();
+
+        try
+        {
+            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
+            String[] nextLine;
+
+            while ((nextLine = reader.readNext()) != null)
+            {
+                System.out.println(
+                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
+                String nom = nextLine[0];
+                String prenom = nextLine[1];
+                double montant = Double.parseDouble(nextLine[2]);
+                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
+
+                Client c = new Client(nom, prenom, montant, date);
+                list.add(c);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        //------------------------------------------------------------------------------------------------//
+        // TRAITEMENT
+
+        List<String> flatList = list.parallelStream()
+            .map(c -> c.getNom())
+            .distinct()
+            .collect(Collectors.toList());
+
+        flatList.forEach(c -> System.out.println(c));
     }
 
     @Test
