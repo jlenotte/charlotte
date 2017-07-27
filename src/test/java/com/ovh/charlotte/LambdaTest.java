@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import com.opencsv.CSVReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class LambdaTest
     public void filterTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -82,7 +83,7 @@ public class LambdaTest
     public void aggregationTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -129,7 +130,7 @@ public class LambdaTest
     public void reduceTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -173,7 +174,7 @@ public class LambdaTest
     public void groupingTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -204,10 +205,10 @@ public class LambdaTest
         // TRAITEMENT
 
         Map<ZonedDateTime, List<Client>> sumAll = list.stream()
-            .filter(client -> client.getDate().getYear() == 2013)
-            .filter(client -> client.getDate().getMonthValue() == 6)
-            .filter(client -> client.getNom().equals("Vital"))
-            .filter(client -> client.getPrenom().equals("Oda"))
+            .filter(client -> client.getDate().getYear() == 2016)
+            .filter(client -> client.getDate().getMonthValue() == 7)
+            .filter(client -> client.getNom().equals("Natali"))
+            .filter(client -> client.getPrenom().equals("Virginia"))
             .distinct()
             .collect(Collectors.groupingBy(Client::getDate));
 
@@ -225,7 +226,7 @@ public class LambdaTest
     public void monthlySum() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -255,22 +256,22 @@ public class LambdaTest
         //------------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        double sum = list.stream()
-            .filter(client -> client.getDate().getYear() == 2013)
-            .filter(client -> client.getDate().getMonthValue() == 6)
-            .filter(client -> client.getNom().equals("Vital"))
-            .filter(client -> client.getPrenom().equals("Oda"))
+        double sum = list.parallelStream()
+            .filter(client -> client.getDate().getYear() == 2010)
+            .filter(client -> client.getDate().getMonth() == Month.OCTOBER)
+            .filter(client -> client.getNom().equals("Natali"))
+            .filter(client -> client.getPrenom().equals("Virginia"))
             .mapToDouble(Client::getMontant)
             .sum();
 
-        System.out.println("\n" + "TOTAL TRANSACTIONS DE 'VITAL ODA' POUR JUIN 2013" + sum);
+        System.out.println("\n" + "TOTAL TRANSACTIONS DE 'VITAL ODA' POUR JUIN 2013 : " + sum);
     }
 
     @Test
     public void topNElementsTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -322,7 +323,7 @@ public class LambdaTest
     public void topNElementsLambdaTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -355,7 +356,7 @@ public class LambdaTest
         final int[] i = {1};
         System.out.println("\n ///// TOP 100 DES MONTANTS DE TRANSACTIONS LAMBDA /////");
         Comparator<Client> byCost = Comparator.comparingDouble(Client::getMontant);
-        list.stream()
+        list.parallelStream()
             .sorted(byCost.reversed())
             .limit(100)
             .forEach(client -> System.out.println("[" + (i[0]++) + "] " + client));
@@ -365,7 +366,7 @@ public class LambdaTest
     public void multiCriteresComparatorTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -398,7 +399,7 @@ public class LambdaTest
         Comparator<Client> byMontant = Comparator.comparing(Client::getMontant);
         Comparator<Client> byName = Comparator.comparing(Client::getNom);
 
-        list.stream()
+        list.parallelStream()
             .sorted(byMontant.thenComparing(byName))
 //            .map(Client::getDate)
             .forEach(System.out::println);
@@ -408,7 +409,7 @@ public class LambdaTest
     public void yyyyMmGlobalTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -437,13 +438,14 @@ public class LambdaTest
 
         //------------------------------------------------------------------------------------------------//
         // TRAITEMENT
+
     }
 
     @Test
     public void yyyyMmNomTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 
@@ -482,7 +484,7 @@ public class LambdaTest
     public void flatMapTest() throws IOException
     {
         //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER
+        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
         ArrayList<Client> list = new ArrayList<>();
 

@@ -34,13 +34,13 @@ public class DataBaseWriteTest
                 String prenom = String.valueOf(Prenoms.getRandomName());
                 Random rand = new Random();
                 long now = System.currentTimeMillis();
-                long min = 30l * 365l * 24l * 3600l * 1000l;
+                long min = 31l * 365l * 24l * 3600l * 1000l;
                 long max = 47l * 365l * 24l * 3600l * 1000l;
                 long l = min + (long) (Math.random() * (max - min));
                 Instant instant = Instant.ofEpochMilli(l);
                 ZonedDateTime date = ZonedDateTime.ofInstant(instant, UTC_ZONE_ID);
                 double montant = ThreadLocalRandom.current()
-                    .nextDouble(-50000, 1000000 + 1);
+                    .nextDouble(-5000, 5000 + 1);
 
                 // Generation client & ajout dans ArrayList
                 Client c = new Client(nom, prenom, montant, date);
