@@ -6,6 +6,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import org.junit.Test;
 
 public class Traitements
@@ -118,7 +122,7 @@ public class Traitements
             // Ajouter année à K
             year = String.valueOf(client.getDate().getYear());
             month = String.valueOf(client.getDate().getMonthValue());
-            String key = year + "_" + month;
+            String key = year + "/" + month;
             double value = client.getMontant();
 
             if (map.containsKey(key))
@@ -129,16 +133,22 @@ public class Traitements
                 map.put(key, value);
             } else
             {
+                // sinon, si aucune clé ne correspond, ajouter une nouvelle clé/valeur
                 map.put(key, value);
             }
-
-            // Faire la somme des factures de chaque mois
-
-            // Ajouter chaque somme dans le hashmap
-
-            // (K = 2010_08 V = sommeMois)
         }
 
-        System.out.println(map);
+        Map<String, Double> sortedMap = new TreeMap<>(map);
+//        System.out.println(sortedMap);
+        List<Double> sortedValues = new ArrayList<>();
+        for (Entry<String, Double> result : sortedMap.entrySet())
+        {
+            System.out
+                .println("Total des recettes pour " + result.getKey() + " : " + result.getValue());
+            sortedValues.add(result.getValue());
+        }
+        System.out.println(sortedValues);
+
+        HashMap<String, HashMap<String, HashMap<String, HashMap>>> mapMess = new HashMap<>();
     }
 }
