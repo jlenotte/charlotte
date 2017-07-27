@@ -127,13 +127,13 @@ public class Traitements
 
             if (map.containsKey(key))
             {
-                // si la clé existe
-                // on ajoute la valeur à la précédente pour ne pas écraser
+                // if key exists
+                // we add the value to the already existing one to avoid overwritting
                 value += map.get(key);
                 map.put(key, value);
             } else
             {
-                // sinon, si aucune clé ne correspond, ajouter une nouvelle clé/valeur
+                // otherwise, we simply add a new key/value entry
                 map.put(key, value);
             }
         }
