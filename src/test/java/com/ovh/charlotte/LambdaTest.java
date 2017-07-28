@@ -2,8 +2,6 @@ package com.ovh.charlotte;
 
 import static org.junit.Assert.assertTrue;
 
-import com.opencsv.CSVReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.time.Month;
 import java.time.ZonedDateTime;
@@ -15,9 +13,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LambdaTest
 {
+
+    Logger LOGGER = LoggerFactory.getLogger("My Log");
 
     @Test
     public void splitTest()
@@ -34,46 +36,20 @@ public class LambdaTest
     @Test
     public void filterTest() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
+        DataSource.readFile();
 
-        ArrayList<Client> list = new ArrayList<>();
-
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        List<Client> result = list.stream()
+        List<Invoice> result = DataSource.list.stream()
             .filter(client -> client.getDate().getYear() == 2013)
-            .filter(client -> client.getNom().equals("Patel"))
-            .filter(client -> client.getPrenom().equals("Carlo"))
+            .filter(client -> client.getName().equals("Patel"))
+            .filter(client -> client.getFirstName().equals("Carlo"))
             .collect(Collectors.toList());
 
         // Afficher
         System.out.println("\n ///// FILTRAGE DES OPERATIONS DE Patel Carlo EN 2013 /////");
-        for (Client cc : result)
+        for (Invoice cc : result)
         {
             System.out.println(cc);
         }
@@ -82,46 +58,29 @@ public class LambdaTest
     @Test
     public void aggregationTest() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        double sum = list.stream()
+        double sum = DataSource.list.stream()
             .filter(client -> client.getDate().getYear() == 2013)
-            .filter(client -> client.getNom().equals("Natali"))
-            .filter(client -> client.getPrenom().equals("Jules"))
-            .mapToDouble(Client::getMontant)
+            .filter(client -> client.getName().equals("Patel"))
+            .filter(client -> client.getFirstName().equals("Will"))
+            .mapToDouble(Invoice::getTransaction)
             .sum();
-        assertTrue(!list.isEmpty());
+        assertTrue(!DataSource.list.isEmpty());
 
         // Affichage
+        if (sum == 0)
+        {
+            //LOGGER.
+        }
+        else
+        {
+
+        }
         System.out.println("\n ///// AGGREGATION SOMME DES MONTANTS DE PATEL WILL /////");
         System.out.println("Sum of all transactions from 'Patel Will' : " + sum);
     }
@@ -129,39 +88,14 @@ public class LambdaTest
     @Test
     public void reduceTest() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        double sumReduce = list.stream()
-            .mapToDouble(Client::getMontant)
+        double sumReduce = DataSource.list.stream()
+            .mapToDouble(Invoice::getTransaction)
             .reduce(0,
                 (a, b) -> a + b);
 
@@ -173,48 +107,23 @@ public class LambdaTest
     @Test
     public void groupingTest() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        Map<ZonedDateTime, List<Client>> sumAll = list.stream()
+        Map<ZonedDateTime, List<Invoice>> sumAll = DataSource.list.stream()
             .filter(client -> client.getDate().getYear() == 2016)
             .filter(client -> client.getDate().getMonthValue() == 7)
-            .filter(client -> client.getNom().equals("Natali"))
-            .filter(client -> client.getPrenom().equals("Virginia"))
+            .filter(client -> client.getName().equals("Natali"))
+            .filter(client -> client.getFirstName().equals("Virginia"))
             .distinct()
-            .collect(Collectors.groupingBy(Client::getDate));
+            .collect(Collectors.groupingBy(Invoice::getDate));
 
         // Affichage
         System.out.println("\n ///// GROUPBY /////");
-        for (Entry<ZonedDateTime, List<Client>> ccc : sumAll.entrySet())
+        for (Entry<ZonedDateTime, List<Invoice>> ccc : sumAll.entrySet())
         {
             System.out.println(ccc);
         }
@@ -223,45 +132,20 @@ public class LambdaTest
     }
 
     @Test
-    public void monthlySum() throws IOException
+    public void getMonthlySum() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        double sum = list.parallelStream()
+        double sum = DataSource.list.parallelStream()
             .filter(client -> client.getDate().getYear() == 2010)
             .filter(client -> client.getDate().getMonth() == Month.OCTOBER)
-            .filter(client -> client.getNom().equals("Natali"))
-            .filter(client -> client.getPrenom().equals("Virginia"))
-            .mapToDouble(Client::getMontant)
+            .filter(client -> client.getName().equals("Natali"))
+            .filter(client -> client.getFirstName().equals("Virginia"))
+            .mapToDouble(Invoice::getTransaction)
             .sum();
 
         System.out.println("\n" + "TOTAL TRANSACTIONS DE 'VITAL ODA' POUR JUIN 2013 : " + sum);
@@ -270,47 +154,22 @@ public class LambdaTest
     @Test
     public void topNElementsTest() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
         List<Double> toplist = new ArrayList<>();
-        double montant;
+        double transaction;
 
-        for (Client c : list)
+        for (Invoice c : DataSource.list)
         {
-            montant = c.getMontant();
-            toplist.add(montant);
+            transaction = c.getTransaction();
+            toplist.add(transaction);
         }
 
-        Collections.sort(toplist, Collections.reverseOrder());
+        toplist.sort(Collections.reverseOrder());
 
         // Affichage
         System.out.println("\n ///// TOP 100 DES MONTANTS DE TRANSACTIONS /////");
@@ -320,202 +179,52 @@ public class LambdaTest
     }
 
     @Test
-    public void topNElementsLambdaTest() throws IOException
+    public void getTopCustomers() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
         final int[] i = {1};
-        System.out.println("\n ///// TOP 100 DES MONTANTS DE TRANSACTIONS LAMBDA /////");
-        Comparator<Client> byCost = Comparator.comparingDouble(Client::getMontant);
-        list.parallelStream()
+        System.out.println("\n ///// TOP 1000 CLIENTS ///// \n");
+        Comparator<Invoice> byCost = Comparator.comparingDouble(Invoice::getTransaction);
+        DataSource.list.parallelStream()
             .sorted(byCost.reversed())
-            .limit(100)
+            .limit(1000)
             .forEach(client -> System.out.println("[" + (i[0]++) + "] " + client));
     }
 
     @Test
-    public void multiCriteresComparatorTest() throws IOException
+    public void multiCriteriaComparator() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        Comparator<Client> byMontant = Comparator.comparing(Client::getMontant);
-        Comparator<Client> byName = Comparator.comparing(Client::getNom);
+        Comparator<Invoice> byMontant = Comparator.comparing(Invoice::getTransaction);
+        Comparator<Invoice> byName = Comparator.comparing(Invoice::getName);
 
-        list.parallelStream()
+        DataSource.list.parallelStream()
             .sorted(byMontant.thenComparing(byName))
 //            .map(Client::getDate)
             .forEach(System.out::println);
     }
 
     @Test
-    public void yyyyMmGlobalTest() throws IOException
-    {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
-
-        ArrayList<Client> list = new ArrayList<>();
-
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
-        // TRAITEMENT
-
-    }
-
-    @Test
-    public void yyyyMmNomTest() throws IOException
-    {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
-
-        ArrayList<Client> list = new ArrayList<>();
-
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
-        // TRAITEMENT
-
-//        Map<ZonedDateTime, List<Client>> dateList = list.stream()
-//            .collect(Collectors.groupingBy(client -> client), Collectors.groupingBy(Client::getNom))
-
-    }
-
-    @Test
     public void flatMapTest() throws IOException
     {
-        //------------------------------------------------------------------------------------------------//
-        // OUVERTURE FICHIER & CONVERSION VERS ARRAYLIST D'OBJETS
 
-        ArrayList<Client> list = new ArrayList<>();
+        DataSource.readFile();
 
-        try
-        {
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
-            String[] nextLine;
-
-            while ((nextLine = reader.readNext()) != null)
-            {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3]);
-                String nom = nextLine[0];
-                String prenom = nextLine[1];
-                double montant = Double.parseDouble(nextLine[2]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[3]);
-
-                Client c = new Client(nom, prenom, montant, date);
-                list.add(c);
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        //------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------------------------------------------//
         // TRAITEMENT
 
-        List<String> flatList = list.parallelStream()
-            .map(c -> c.getNom())
+        List<String> flatList = DataSource.list.parallelStream()
+            .map(c -> c.getName())
             .distinct()
             .collect(Collectors.toList());
 
