@@ -1,20 +1,21 @@
 package com.ovh.charlotte;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 
-public class Invoice
+public class Invoice extends ArrayList<Invoice>
 {
 
     // Attributes
+    private String nichandle;
     private String name;
     private String firstName;
-    private String nichandle;
     private ZonedDateTime date;
     private Double transaction;
 
     // Constructor
 
-    public Invoice()
+    Invoice()
     {
         this.name = null;
         this.firstName = null;

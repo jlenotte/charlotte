@@ -13,17 +13,15 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
-import org.junit.Test;
 
-public class DataBaseWriteTest
+public class DataBaseWriter
 {
 
     private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     private static ArrayList<Invoice> dataList = new ArrayList<Invoice>();
-    private final static Logger LOGGER = Logger.getLogger(DataBaseWriteTest.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(DataBaseWriter.class.getName());
 
-    @Test
-    public void dataBaseGeneration()
+    static void dataBaseGeneration()
     {
         try
         {
@@ -56,7 +54,6 @@ public class DataBaseWriteTest
 
                 // Generation client & ajout dans ArrayList
                 Invoice c = new Invoice(nic, name, firstName, transaction, date);
-                dataList.add(c);
 
                 // Affichage en console et écriture dans fichier
                 System.out.println(

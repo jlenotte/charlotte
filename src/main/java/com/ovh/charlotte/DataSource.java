@@ -14,23 +14,24 @@ public class DataSource
 {
 
     private final static Logger LOGGER = Logger.getLogger(DataSource.class.getName());
-    static ArrayList<Invoice> list = new ArrayList<>();
 
-    static void readFile()
+
+    public ArrayList<Invoice> readFile(String fileName)
     {
+        ArrayList<Invoice> list = new ArrayList<>();
         try
         {
             LOGGER.setLevel(Level.ALL);
             LOGGER.log(INFO, "Reading CSV File...");
 
-            CSVReader reader = new CSVReader(new FileReader("dataBase.csv"), ',');
+            CSVReader reader = new CSVReader(new FileReader(fileName), ',');
             String[] nextLine;
 
             while ((nextLine = reader.readNext()) != null)
             {
-                System.out.println(
-                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3] + " "
-                        + nextLine[4]);
+//                System.out.println(
+//                    nextLine[0] + " " + nextLine[1] + " " + nextLine[2] + " " + nextLine[3] + " "
+//                        + nextLine[4]);
                 String nic = nextLine[0];
                 String name = nextLine[1];
                 String firstName = nextLine[2];
@@ -49,5 +50,7 @@ public class DataSource
             LOGGER.log(WARNING,
                 "An error occured while trying to read CSV file. Please check your file's location.");
         }
+        return list;
     }
+
 }
