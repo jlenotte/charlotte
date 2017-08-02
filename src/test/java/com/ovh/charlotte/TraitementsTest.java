@@ -1,8 +1,7 @@
 package com.ovh.charlotte;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.time.ZonedDateTime;
@@ -18,32 +17,14 @@ public class TraitementsTest
     final static Logger LOGGER = LoggerFactory.getLogger(TraitementsTest.class);
 
     @Test
-    public void robustnessTest1()
-    {
-        try
-        {
-            List<Invoice> result = new ArrayList<>(null);
-            Traitements t = new Traitements();
-            t.getBestCustomer(result);
-            assertNotNull(result);
-        }
-        catch (Exception e)
-        {
-            fail("A thousand kittens have just died because of your lame code.");
-        }
-    }
-
-    @Test
-    public void getBestCustomerTest()
+    public void getBestCustomerTopOneTest()
     {
         try
         {
             // Init
-            DataSource ds = new DataSource();
             Traitements t = new Traitements();
 
             // ***********THE RESULT COMES FROM THE PROCESS**********
-            String file = "dataBase.csv";
             List<Invoice> actual = new ArrayList<>();
 
             // date
@@ -54,17 +35,67 @@ public class TraitementsTest
 
             // Test that the text format is right
 
-//            actual.add(inv);
-            List<Invoice> expected = t.getTotalPerYearPerCustomer(actual);
+            // Test that the list is correctly initialized
 
-            assertNotNull(actual);
-            assertTrue(actual != null);
-            assertFalse(expected.contains(null));
+            actual.add(inv);
+            List<Invoice> expected = t.getBestCustomer(actual, 1);
+
+            // Test that the list is not null
+            assertNotNull(expected);
+
+            // Test that if input is empty, then output must be empty as well
+            assertEquals(actual.isEmpty(), expected.isEmpty());
+
+            // Test that list size is the same
+            assertEquals(actual.size(), expected.size());
+
         }
         catch (Exception e)
         {
             fail("A thousand kittens have just died because of your lame code !");
             LOGGER.debug(e.getMessage());
+        }
+    }
+
+    @Test
+    public void getBestCustomerTopThreeTest()
+    {
+        try
+        {
+            // Init
+            Traitements t = new Traitements();
+            int amount = 3;
+
+            // ***********THE RESULT COMES FROM THE PROCESS**********
+            List<Invoice> actual = new ArrayList<>();
+
+            // date
+            ZonedDateTime date = ZonedDateTime.parse("2006-11-15T19:44:33.312Z[UTC]");
+
+            // Initialize an invoice
+            Invoice inv = new Invoice("lj123123-ovh", "Lenotte", "Jules", 320.00, date);
+            Invoice inv2 = new Invoice("aj124124-ovh", "Archibald", "Jean-Celestin", 200.00, date);
+
+            actual.add(inv);
+            actual.add(inv);
+            actual.add(inv);
+            actual.add(inv2);
+
+            List<Invoice> expected = t.getBestCustomer(actual, amount);
+
+            // Test that the output "N" is equal to the amount of top "N"
+            assertEquals(expected.size(), amount);
+
+            // Test that the list is not null
+            assertNotNull(expected);
+
+            // Test that if input is empty, then output must be empty as well
+            assertEquals(actual.isEmpty(), expected.isEmpty());
+        }
+        catch (Exception e)
+        {
+            fail("A thousand kittens have just died because of your lame code !");
+            LOGGER.error(e.getMessage());
         }
     }
 }

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 public class Main
 {
-
     //Logger
     private final static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -23,11 +22,19 @@ public class Main
         // Lists
         HashMap<String, Double> yearTotalMap = new HashMap<>();
 
-        // Method calls
-        t.getBestCustomer(invoiceData);
-        t.getTotalPerMonth(invoiceData);
-        t.getTotalPerYearPerCustomer(invoiceData);
-        t.getTotalPerYear(invoiceData, yearTotalMap);
-        t.getTopTenMonths(invoiceData);
+        // Check if the file is empty
+        if (invoiceData.isEmpty())
+        {
+            LOGGER.error("The file is empty and the process will stop.");
+        }
+        else
+        {
+            // Method calls
+            t.getBestCustomer(invoiceData, 100);
+            t.getTotalPerMonth(invoiceData);
+            t.getTotalPerYearPerCustomer(invoiceData);
+            t.getTotalPerYear(invoiceData, yearTotalMap);
+            t.getTopTenMonths(invoiceData);
+        }
     }
 }

@@ -19,14 +19,13 @@ import org.slf4j.LoggerFactory;
 
 class Traitements
 {
-
     final static Logger LOGGER = LoggerFactory.getLogger(Traitements.class);
 
     /**
      * Return a list of the top N clients
      * @return returnedList
      */
-    List<Invoice> getBestCustomer(List<Invoice> list) throws IOException
+    List<Invoice> getBestCustomer(List<Invoice> list, int amount) throws IOException
     {
         // Init variables
         String reportPath = "TOP_CUSTOMER_REPORT.csv";
@@ -38,11 +37,21 @@ class Traitements
         // Init comparator
         Comparator<Invoice> byCost = Comparator.comparingDouble(Invoice::getTransaction);
 
+        // Check if the list is empty and log
+        if (list.isEmpty())
+        {
+            LOGGER.error("The list is empty and results may not be processed properly.");
+        }
+        else
+        {
+            LOGGER.debug("List values detected, proceeding...");
+        }
+
         // Sort the list and limit 100
         List<Invoice> returnedList = list
             .parallelStream()
             .sorted(byCost.reversed())
-            .limit(100)
+            .limit(amount)
             .collect(Collectors.toList());
 
 
@@ -53,11 +62,12 @@ class Traitements
         bw.flush();
 
         // Log
-        LOGGER.debug(String.valueOf(returnedList));
+        LOGGER.info(String.valueOf(returnedList));
         LOGGER.debug("Query OK.");
         LOGGER.debug("Report generated.");
         return returnedList;
     }
+
 
     /**
      * Get the total of all transactions per month
@@ -67,6 +77,17 @@ class Traitements
     {
         // Init Variables
         HashMap<String, Double> map = new HashMap<>();
+
+        // Check if the list is empty and log
+        if (list.isEmpty())
+        {
+            LOGGER.error("The list is empty and results may not be processed properly.");
+        }
+        else
+        {
+            LOGGER.debug("List values detected, proceeding...");
+        }
+
 
         // For each client of the list
         for (Invoice client : list)
@@ -96,10 +117,11 @@ class Traitements
         Map<String, Double> sortedMap = new TreeMap<>(map);
         List<Double> sortedValues = new ArrayList<>();
 
+
         // Loop through the sorted map to display results
         for (Entry<String, Double> result : sortedMap.entrySet())
         {
-            LOGGER.debug("Total des recettes pour " + result.getKey() + " : " + result.getValue());
+            LOGGER.info("Total des recettes pour " + result.getKey() + " : " + result.getValue());
             sortedValues.add(result.getValue());
         }
 
@@ -112,14 +134,15 @@ class Traitements
 
         if (monthComparison == 0)
         {
-            LOGGER.debug("No matches found.");
+            LOGGER.error("No matches found.");
         }
         else
         {
-            LOGGER.debug("Total des recettes depuis 2000/12 : " + monthComparison);
+            LOGGER.info("Total des recettes depuis 2000/12 : " + monthComparison);
         }
         return monthComparison;
     }
+
 
     /**
      * Get top 10 months ever made
@@ -130,6 +153,17 @@ class Traitements
 
         // Init variables
         HashMap<String, Double> map = new HashMap<>();
+
+        // Check if the list is empty and log
+        if (list.isEmpty())
+        {
+            LOGGER.error("The list is empty and results may not be processed properly.");
+        }
+        else
+        {
+            LOGGER.debug("List values detected, proceeding...");
+        }
+
 
         // For each client of the list
         for (Invoice client : list)
@@ -157,12 +191,22 @@ class Traitements
         }
 
         List<Double> topTenMonths = new ArrayList<>(map.values());
-        topTenMonths.sort(Collections.reverseOrder());
-        topTenMonths.subList(0, 10);
+
+        try
+        {
+            topTenMonths.sort(Collections.reverseOrder());
+            topTenMonths.subList(0, 10);
+        }
+        catch (Exception e)
+        {
+            LOGGER.error(
+                "Error, input list may be empty and you may get an IndexOutOfBound exception.");
+            LOGGER.error("Exception message : " + e.getMessage());
+        }
 
         if (topTenMonths.isEmpty())
         {
-            LOGGER.debug("The file may not have been processed correctly.");
+            LOGGER.error("The file may not have been processed correctly.");
         }
         else
         {
@@ -175,8 +219,7 @@ class Traitements
         FileWriter fw = new FileWriter(f, false);
         BufferedWriter bw = new BufferedWriter(fw);
 
-
-        LOGGER.debug("Top ten months result : " + topTenMonths);
+        LOGGER.info("Top ten months result : " + topTenMonths);
         LOGGER.debug("Generating report...");
         for (Double reportList : topTenMonths)
         {
@@ -188,6 +231,7 @@ class Traitements
         LOGGER.debug("Report generated.");
         return topTenMonths;
     }
+
 
     /**
      * Get the total of a customer per year
@@ -209,11 +253,11 @@ class Traitements
         // Check
         if (sum == 0)
         {
-            LOGGER.debug("No matches found.");
+            LOGGER.error("No matches found.");
         }
         else
         {
-            LOGGER.debug("Total transactions for selected client : " + sum);
+            LOGGER.info("Total transactions for selected client : " + sum);
             LOGGER.debug("Query successfully executed for : getTotalPerYearPerCustomer().");
         }
 
@@ -242,6 +286,7 @@ class Traitements
         return list;
     }
 
+
     /**
      * Get the total revenue of each year since 2000
      * @param hm HashMap<>
@@ -253,6 +298,16 @@ class Traitements
     {
         // Init variables
         HashMap<String, Double> map = new HashMap<>();
+
+        // Check if the list is empty and log
+        if (list.isEmpty())
+        {
+            LOGGER.error("The list is empty and results will not be processed properly.");
+        }
+        else
+        {
+            LOGGER.debug("List values detected, proceeding...");
+        }
 
 
         // For each client of the list, add keys and values to a Map
@@ -283,9 +338,14 @@ class Traitements
         Map<String, Double> sortedMap = new TreeMap<>(map);
         List<Double> sortedValues = new ArrayList<>();
 
+        if (sortedMap.values().isEmpty())
+        {
+            LOGGER.error("Warning : empty values detected.");
+        }
+
         for (Entry<String, Double> result : sortedMap.entrySet())
         {
-            LOGGER.debug("Total des recettes pour " + result.getKey() + " : " + result.getValue());
+            LOGGER.info("Total des recettes pour " + result.getKey() + " : " + result.getValue());
             sortedValues.add(result.getValue());
         }
 
@@ -311,8 +371,8 @@ class Traitements
         }
         catch (Exception e)
         {
-            LOGGER.debug(e.getMessage());
-            LOGGER.debug("Report was not generated properly.");
+            LOGGER.error(e.getMessage());
+            LOGGER.error("Report was not generated properly.");
         }
 
         LOGGER.debug("Report generated.");

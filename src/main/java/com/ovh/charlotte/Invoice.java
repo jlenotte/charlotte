@@ -24,10 +24,10 @@ public class Invoice extends ArrayList<Invoice>
         this.date = null;
     }
 
-    Invoice(String nichandle, String name, String prename, Double transaction, ZonedDateTime date)
+    Invoice(String nichandle, String name, String firstName, Double transaction, ZonedDateTime date)
     {
         this.name = name;
-        this.firstName = prename;
+        this.firstName = firstName;
         this.nichandle = nichandle;
         this.transaction = transaction;
         this.date = date;
