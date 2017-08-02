@@ -24,27 +24,27 @@ class Traitements
 
     /**
      * Return a list of the top N clients
-     *
      * @return returnedList
      */
-
     List<Invoice> getBestCustomer(List<Invoice> list) throws IOException
     {
-        // Init
+        // Init variables
         String reportPath = "TOP_CUSTOMER_REPORT.csv";
         File f = new File(reportPath);
         FileWriter fw = new FileWriter(f, false);
         BufferedWriter bw = new BufferedWriter(fw);
 
+
         // Init comparator
         Comparator<Invoice> byCost = Comparator.comparingDouble(Invoice::getTransaction);
 
-        // Stream
+        // Sort the list and limit 100
         List<Invoice> returnedList = list
             .parallelStream()
             .sorted(byCost.reversed())
             .limit(100)
             .collect(Collectors.toList());
+
 
         // Check & report
         LOGGER.debug("Generating report...");
@@ -52,6 +52,7 @@ class Traitements
         bw.newLine();
         bw.flush();
 
+        // Log
         LOGGER.debug(String.valueOf(returnedList));
         LOGGER.debug("Query OK.");
         LOGGER.debug("Report generated.");
@@ -60,27 +61,22 @@ class Traitements
 
     /**
      * Get the total of all transactions per month
-     *
      * @return List of doubles
      */
-    List<Double> getMonthTotals(List<Invoice> list) throws IOException
+    double getTotalPerMonth(List<Invoice> list) throws IOException
     {
-
-        //----------------------------------------------------------------------------------------//
-        // TRAITEMENT
-
-        DataSource ds = new DataSource();
-        String file = "dataBase.csv";
-
+        // Init Variables
         HashMap<String, Double> map = new HashMap<>();
+
         // For each client of the list
-        for (Invoice client : ds.readFile(file))
+        for (Invoice client : list)
         {
-            // Add year & month as Key
+            // Init variables
             String year = String.valueOf(client.getDate().getYear());
             String month = String.valueOf(client.getDate().getMonthValue());
-            String key = year + "/" + month;
 
+            // Assign variables to <K, V>
+            String key = year + "/" + month;
             double value = client.getTransaction();
 
             if (map.containsKey(key))
@@ -97,23 +93,18 @@ class Traitements
             }
         }
 
-        //----------------------------------------------------------------------------------------//
-        // Affichage
-
         Map<String, Double> sortedMap = new TreeMap<>(map);
         List<Double> sortedValues = new ArrayList<>();
 
+        // Loop through the sorted map to display results
         for (Entry<String, Double> result : sortedMap.entrySet())
         {
             LOGGER.debug("Total des recettes pour " + result.getKey() + " : " + result.getValue());
             sortedValues.add(result.getValue());
         }
 
-        //----------------------------------------------------------------------------------------//
-        // TOTAL CA OF ALL TIMES
-
-        List<Double> topTenMonths = new ArrayList<>(map.values());
-
+        // Total revenue since 2000
+        // Sum up all the values into a variable
         double monthComparison = sortedValues
             .parallelStream()
             .mapToDouble(aDouble -> aDouble)
@@ -127,63 +118,93 @@ class Traitements
         {
             LOGGER.debug("Total des recettes depuis 2000/12 : " + monthComparison);
         }
+        return monthComparison;
+    }
 
-        //----------------------------------------------------------------------------------------//
-        // GET 10 BEST MONTHS
+    /**
+     * Get top 10 months ever made
+     */
+    List<Double> getTopTenMonths(List<Invoice> list) throws IOException
+    {
+        LOGGER.debug("Now processing file to get the best 10 months...");
 
-        Comparator<Double> byCost = Comparator.comparingDouble(aDouble -> aDouble);
+        // Init variables
+        HashMap<String, Double> map = new HashMap<>();
 
-        sortedValues
-            .parallelStream()
-            .sorted(byCost.reversed())
-            .limit(10);
+        // For each client of the list
+        for (Invoice client : list)
+        {
+            // Init variables
+            String year = String.valueOf(client.getDate().getYear());
+            String month = String.valueOf(client.getDate().getMonthValue());
 
+            // Assign variables to <K, V>
+            String key = year + "/" + month;
+            double value = client.getTransaction();
+
+            if (map.containsKey(key))
+            {
+                // if a key already exists
+                // the value will be added to the already existing one to avoid overwritting
+                value += map.get(key);
+                map.put(key, value);
+            }
+            else
+            {
+                // otherwise, we simply add a new key/value entry
+                map.put(key, value);
+            }
+        }
+
+        List<Double> topTenMonths = new ArrayList<>(map.values());
         topTenMonths.sort(Collections.reverseOrder());
-        topTenMonths = topTenMonths.subList(0, 10);
-        LOGGER.debug("topTenMonths : " + topTenMonths);
-        LOGGER.debug("Query successfully executed for : getMonthTotal().");
+        topTenMonths.subList(0, 10);
 
-        //----------------------------------------------------------------------------------------//
-        // Generate report
+        if (topTenMonths.isEmpty())
+        {
+            LOGGER.debug("The file may not have been processed correctly.");
+        }
+        else
+        {
+            LOGGER.debug("Top ten months successfully processed.");
+        }
 
-        // Init
-        LOGGER.debug("Generating report...");
-        String filePath = "TOP_MONTHS_REPORT.csv";
+        // Report
+        String filePath = "TOP_TEN_MONTHS_REPORT.csv";
         File f = new File(filePath);
         FileWriter fw = new FileWriter(f, false);
         BufferedWriter bw = new BufferedWriter(fw);
 
-        // Write
-        for (Double topTenMonth : topTenMonths)
+
+        LOGGER.debug("Top ten months result : " + topTenMonths);
+        LOGGER.debug("Generating report...");
+        for (Double reportList : topTenMonths)
         {
-            bw.write(String.valueOf(topTenMonth));
+            bw.write(String.valueOf(reportList));
             bw.newLine();
             bw.flush();
         }
-        LOGGER.debug("Report generated.");
 
-        // Return
+        LOGGER.debug("Report generated.");
         return topTenMonths;
     }
 
-    List<Invoice> getCustomerYearlyTotal(List<Invoice> l) throws IOException
+    /**
+     * Get the total of a customer per year
+     * @param list Input a List<> as a parameter
+     * @return returns a List<> of Invoices
+     * @throws IOException IOException
+     */
+    List<Invoice> getTotalPerYearPerCustomer(List<Invoice> list) throws IOException
     {
-
-        //----------------------------------------------------------------------------------------//
-        // TRAITEMENT
-
-        // Init
-        DataSource ds = new DataSource();
-        ds.readFile("dataBase.csv");
-        ArrayList<Invoice> list = new ArrayList<Invoice>();
-
-        // Stream
-        double sum = l.parallelStream()
+        // Stream & filter the list into a sum
+        double sum = list.parallelStream()
             .filter(client -> client.getDate().getYear() == 2012)
             .filter(client -> client.getName().equals("Vital"))
             .filter(client -> client.getFirstName().equals("Virginia"))
             .mapToDouble(Invoice::getTransaction)
             .sum();
+
 
         // Check
         if (sum == 0)
@@ -193,19 +214,16 @@ class Traitements
         else
         {
             LOGGER.debug("Total transactions for selected client : " + sum);
-            LOGGER.debug("Query successfully executed for : getCustomerYearlyTotal().");
+            LOGGER.debug("Query successfully executed for : getTotalPerYearPerCustomer().");
         }
 
-        //----------------------------------------------------------------------------------------//
         // Generate report
-
         // Init
         String filePath = "CUSTOMER_YEARLY_REPORT.csv";
         File f = new File(filePath);
         FileWriter fw = new FileWriter(f, false);
         BufferedWriter bw = new BufferedWriter(fw);
 
-        // Try to Write
         try
         {
             LOGGER.debug("Generating report...");
@@ -221,22 +239,25 @@ class Traitements
 
         // Return
         LOGGER.debug("Report generated.");
-        return l;
+        return list;
     }
 
-    HashMap<String, Double> getYearTotal(HashMap<String, Double> hm) throws IOException
+    /**
+     * Get the total revenue of each year since 2000
+     * @param hm HashMap<>
+     * @return HashMap<>
+     * @throws IOException IOException
+     */
+    HashMap<String, Double> getTotalPerYear(List<Invoice> list, HashMap<String, Double> hm)
+        throws IOException
     {
-
-        //----------------------------------------------------------------------------------------//
-        // TRAITEMENT
-
-        String file = "dataBase.csv";
-        DataSource ds = new DataSource();
-        ds.readFile(file);
+        // Init variables
         HashMap<String, Double> map = new HashMap<>();
 
-        // For each client of the list
-        for (Invoice client : ds.readFile(file))
+
+        // For each client of the list, add keys and values to a Map
+        LOGGER.debug("Now reading CSV to map entries into HashMap...");
+        for (Invoice client : list)
         {
             // Add year & month as Key
             String year = String.valueOf(client.getDate().getYear());
@@ -256,9 +277,9 @@ class Traitements
             }
         }
 
-        //----------------------------------------------------------------------------------------//
-        // Affichage
 
+        // Affichage
+        // Map to TreeMap for sorting
         Map<String, Double> sortedMap = new TreeMap<>(map);
         List<Double> sortedValues = new ArrayList<>();
 
@@ -268,12 +289,10 @@ class Traitements
             sortedValues.add(result.getValue());
         }
 
-        LOGGER.debug("Query successfully executed for : getYearTotal().");
+        LOGGER.debug("Query successfully executed for : getTotalPerYear().");
 
-        //----------------------------------------------------------------------------------------//
         // Generate report
-
-        // Init
+        // Init writing variables
         String filePath = "YEARLY_TOTAL_REPORT.csv";
         File f = new File(filePath);
         FileWriter fw = new FileWriter(f, false);
@@ -281,11 +300,19 @@ class Traitements
 
         // Write
         LOGGER.debug("Generating report...");
-        for (Double reportList : sortedValues)
+        try
         {
-            bw.write(String.valueOf(reportList));
-            bw.newLine();
-            bw.flush();
+            for (Double reportList : sortedValues)
+            {
+                bw.write(String.valueOf(reportList));
+                bw.newLine();
+                bw.flush();
+            }
+        }
+        catch (Exception e)
+        {
+            LOGGER.debug(e.getMessage());
+            LOGGER.debug("Report was not generated properly.");
         }
 
         LOGGER.debug("Report generated.");

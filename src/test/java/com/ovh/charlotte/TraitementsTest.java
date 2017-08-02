@@ -1,6 +1,8 @@
 package com.ovh.charlotte;
 
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.time.ZonedDateTime;
@@ -48,18 +50,20 @@ public class TraitementsTest
             ZonedDateTime date = ZonedDateTime.parse("2006-11-15T19:44:33.312Z[UTC]");
 
             // Initialize an invoice
-            Invoice inv = new Invoice("mfdmqsf", "Lenotte", "Jules", 500.00, date);
-            actual.add(inv);
-            List<Invoice> expected = t.getBestCustomer(actual);
+            Invoice inv = new Invoice("lj123123-ovh", "Lenotte", "Jules", 320.00, date);
 
-            // Assert that expected != null
-            assertNotNull(expected);
+            // Test that the text format is right
 
-            //
+//            actual.add(inv);
+            List<Invoice> expected = t.getTotalPerYearPerCustomer(actual);
+
+            assertNotNull(actual);
+            assertTrue(actual != null);
+            assertFalse(expected.contains(null));
         }
         catch (Exception e)
         {
-            fail("A thousand kittens have just died because of your lame code.");
+            fail("A thousand kittens have just died because of your lame code !");
             LOGGER.debug(e.getMessage());
         }
     }

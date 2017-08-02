@@ -1,7 +1,6 @@
 package com.ovh.charlotte;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
@@ -22,13 +21,13 @@ public class Main
         List<Invoice> invoiceData = m.readFile(file);
 
         // Lists
-        List<Double> monthTotalList = new ArrayList<>();
         HashMap<String, Double> yearTotalMap = new HashMap<>();
 
         // Method calls
         t.getBestCustomer(invoiceData);
-        t.getMonthTotals(monthTotalList);
-        t.getCustomerYearlyTotal(invoiceData);
-        t.getYearTotal(yearTotalMap);
+        t.getTotalPerMonth(invoiceData);
+        t.getTotalPerYearPerCustomer(invoiceData);
+        t.getTotalPerYear(invoiceData, yearTotalMap);
+        t.getTopTenMonths(invoiceData);
     }
 }

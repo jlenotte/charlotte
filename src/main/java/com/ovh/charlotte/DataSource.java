@@ -1,19 +1,16 @@
 package com.ovh.charlotte;
 
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.WARNING;
-
 import com.opencsv.CSVReader;
 import java.io.FileReader;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataSource
 {
 
-    private final static Logger LOGGER = Logger.getLogger(DataSource.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(DataSource.class.getName());
 
 
     public ArrayList<Invoice> readFile(String fileName)
@@ -21,8 +18,7 @@ public class DataSource
         ArrayList<Invoice> list = new ArrayList<>();
         try
         {
-            LOGGER.setLevel(Level.ALL);
-            LOGGER.log(INFO, "Reading CSV File...");
+            LOGGER.debug("Reading CSV file...");
 
             CSVReader reader = new CSVReader(new FileReader(fileName), ',');
             String[] nextLine;
@@ -41,14 +37,13 @@ public class DataSource
                 Invoice c = new Invoice(nic, name, firstName, transaction, date);
                 list.add(c);
             }
-            LOGGER.log(INFO, "File was read successfully.");
+            LOGGER.debug("File was read with success.");
         }
         catch (Exception e)
         {
             System.out.println(e.getMessage());
-            LOGGER.setLevel(Level.WARNING);
-            LOGGER.log(WARNING,
-                "An error occured while trying to read CSV file. Please check your file's location.");
+            LOGGER.debug(
+                "An error occured while trying to read the CSV file. Please check your file's name and path.");
         }
         return list;
     }
