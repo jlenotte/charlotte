@@ -1,6 +1,5 @@
 package com.ovh.charlotte;
 
-import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.slf4j.Logger;
@@ -17,23 +16,19 @@ public class Main
         System.out.println("Starting... TEST");
         LOGGER.error("Initializing environment...");
         // Init
+        FlinkJobs jobs = new FlinkJobs();
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+
         DataSet<String> text = env
             .readTextFile("/home/jlenotte/WORKSPACE/CodenameCharlotte/dataBase.csv");
-        FlinkJobs jobs = new FlinkJobs();
 
-        // TO FIX
-        text
-            .sortPartition(1, Order.DESCENDING)
-            .first(100);
-
-        env.execute();
 
         // Method calls
-        jobs.displayContent(text);
-//         jobs.getBestCustomerFlink(text, 100);
+        jobs.getBestCustomerFlink(text, 100);
+//        jobs.getTopTenMonthsFlink();
+//        jobs.getTotalPerYearFlink();
+//        jobs.getTotalPerYearPerCustomerFlink();
 
-        // Flink Jobs writeAsCsv
-        // text.writeAsCsv("FLINK_REPORT.CSV");
+        env.execute();
     }
 }

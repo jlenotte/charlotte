@@ -60,6 +60,31 @@ public class Invoice
         return firstName;
     }
 
+    public void setNichandle(String nichandle)
+    {
+        this.nichandle = nichandle;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setFirstName(String firstName)
+    {
+        this.firstName = firstName;
+    }
+
+    public void setDate(ZonedDateTime date)
+    {
+        this.date = date;
+    }
+
+    public void setTransaction(Double transaction)
+    {
+        this.transaction = transaction;
+    }
+
     public String toString()
     {
         return "[Client]" + "NicHandle: " + nichandle + " Nom: " + name + ", Prenom: " + firstName
