@@ -4,76 +4,81 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.operators.Order;
+import org.apache.flink.api.java.DataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-class Traitements
+class FlinkJobs
 {
-    final static Logger LOGGER = LoggerFactory.getLogger(Traitements.class);
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(FlinkJobs.class);
 
     /**
      * Return a list of the top N clients
+     *
      * @return returnedList
      */
-    List<Invoice> getBestCustomer(List<Invoice> list, int amount) throws IOException
+    DataSet<String> getBestCustomerFlink(DataSet<String> data, int amount) throws IOException
     {
-        // Init variables
-        String reportPath = "TOP_CUSTOMER_REPORT.csv";
-        File f = new File(reportPath);
-        FileWriter fw = new FileWriter(f, false);
-        BufferedWriter bw = new BufferedWriter(fw);
-
-
-        // Init comparator
-        Comparator<Invoice> byCost = Comparator.comparingDouble(Invoice::getTransaction);
-
-        // Check if the list is empty and log
-        if (list.isEmpty())
-        {
-            LOGGER.error("The list is empty and results may not be processed properly.");
-        }
-        else
-        {
-            LOGGER.debug("List values detected, proceeding...");
-        }
 
         // Sort the list and limit 100
-        List<Invoice> returnedList = list
-            .parallelStream()
-            .sorted(byCost.reversed())
-            .limit(amount)
-            .collect(Collectors.toList());
+        data
+            .sortPartition(1, Order.DESCENDING)
+            .first(amount);
 
-
-        // Check & report
-        LOGGER.debug("Generating report...");
-        bw.write(returnedList.toString());
-        bw.newLine();
-        bw.flush();
-
-        // Log
-        LOGGER.info(String.valueOf(returnedList));
+        ////LOGGER.info(String.valueOf(returnedList));
         LOGGER.debug("Query OK.");
-        LOGGER.debug("Report generated.");
-        return returnedList;
+        // LOGGER.debug("Report generated.");
+        return data;
     }
 
+    /**
+     * Display the list with flink
+     */
+    static void displayContent(DataSet<String> text)
+    {
+        text
+            .map((MapFunction<String, Invoice>) s -> {
+
+                String[] splitter = s.split(",");
+
+                // parse string to double
+                double value = Double.parseDouble(splitter[3]);
+
+                // parse string to zdate
+                ZonedDateTime date = ZonedDateTime.parse(splitter[4]);
+
+                // assign values to object params
+                Invoice inv = new Invoice(splitter[0], splitter[1], splitter[2], value, date);
+
+                return inv;
+            })
+            .map(new MapFunction<Invoice, String>()
+            {
+                @Override
+                public String map(Invoice invoice) throws Exception
+                {
+                    return "xxxxxx" + invoice.toString();
+                }
+            }).writeAsText("/tmp/fffuuuuuu"); // once the collect is done, the process stops
+    }
 
     /**
      * Get the total of all transactions per month
+     *
      * @return List of doubles
      */
-    double getTotalPerMonth(List<Invoice> list) throws IOException
+    double getTotalPerMonthFlink(List<Invoice> list) throws IOException
     {
         // Init Variables
         HashMap<String, Double> map = new HashMap<>();
@@ -87,7 +92,6 @@ class Traitements
         {
             LOGGER.debug("List values detected, proceeding...");
         }
-
 
         // For each client of the list
         for (Invoice client : list)
@@ -117,11 +121,10 @@ class Traitements
         Map<String, Double> sortedMap = new TreeMap<>(map);
         List<Double> sortedValues = new ArrayList<>();
 
-
         // Loop through the sorted map to display results
         for (Entry<String, Double> result : sortedMap.entrySet())
         {
-            LOGGER.info("Total des recettes pour " + result.getKey() + " : " + result.getValue());
+            ////LOGGER.info("Total des recettes pour " + result.getKey() + " : " + result.getValue());
             sortedValues.add(result.getValue());
         }
 
@@ -138,7 +141,8 @@ class Traitements
         }
         else
         {
-            LOGGER.info("Total des recettes depuis 2000/12 : " + monthComparison);
+            LOGGER.debug("Query successful for method getTotalPerMonth().");
+            ////LOGGER.info("Total des recettes depuis 2000/12 : " + monthComparison);
         }
         return monthComparison;
     }
@@ -147,7 +151,7 @@ class Traitements
     /**
      * Get top 10 months ever made
      */
-    List<Double> getTopTenMonths(List<Invoice> list) throws IOException
+    List<Double> getTopTenMonthsFlink(List<Invoice> list) throws IOException
     {
         LOGGER.debug("Now processing file to get the best 10 months...");
 
@@ -163,7 +167,6 @@ class Traitements
         {
             LOGGER.debug("List values detected, proceeding...");
         }
-
 
         // For each client of the list
         for (Invoice client : list)
@@ -219,7 +222,7 @@ class Traitements
         FileWriter fw = new FileWriter(f, false);
         BufferedWriter bw = new BufferedWriter(fw);
 
-        LOGGER.info("Top ten months result : " + topTenMonths);
+        //LOGGER.info("Top ten months result : " + topTenMonths);
         LOGGER.debug("Generating report...");
         for (Double reportList : topTenMonths)
         {
@@ -235,11 +238,12 @@ class Traitements
 
     /**
      * Get the total of a customer per year
+     *
      * @param list Input a List<> as a parameter
      * @return returns a List<> of Invoices
      * @throws IOException IOException
      */
-    List<Invoice> getTotalPerYearPerCustomer(List<Invoice> list) throws IOException
+    List<Invoice> getTotalPerYearPerCustomerFlink(List<Invoice> list) throws IOException
     {
         // Stream & filter the list into a sum
         double sum = list.parallelStream()
@@ -249,7 +253,6 @@ class Traitements
             .mapToDouble(Invoice::getTransaction)
             .sum();
 
-
         // Check
         if (sum == 0)
         {
@@ -257,7 +260,7 @@ class Traitements
         }
         else
         {
-            LOGGER.info("Total transactions for selected client : " + sum);
+            //LOGGER.info("Total transactions for selected client : " + sum);
             LOGGER.debug("Query successfully executed for : getTotalPerYearPerCustomer().");
         }
 
@@ -289,11 +292,12 @@ class Traitements
 
     /**
      * Get the total revenue of each year since 2000
+     *
      * @param hm HashMap<>
      * @return HashMap<>
      * @throws IOException IOException
      */
-    HashMap<String, Double> getTotalPerYear(List<Invoice> list, HashMap<String, Double> hm)
+    HashMap<String, Double> getTotalPerYearFlink(List<Invoice> list, HashMap<String, Double> hm)
         throws IOException
     {
         // Init variables
@@ -308,7 +312,6 @@ class Traitements
         {
             LOGGER.debug("List values detected, proceeding...");
         }
-
 
         // For each client of the list, add keys and values to a Map
         LOGGER.debug("Now reading CSV to map entries into HashMap...");
@@ -332,7 +335,6 @@ class Traitements
             }
         }
 
-
         // Affichage
         // Map to TreeMap for sorting
         Map<String, Double> sortedMap = new TreeMap<>(map);
@@ -345,7 +347,7 @@ class Traitements
 
         for (Entry<String, Double> result : sortedMap.entrySet())
         {
-            LOGGER.info("Total des recettes pour " + result.getKey() + " : " + result.getValue());
+            //LOGGER.info("Total des recettes pour " + result.getKey() + " : " + result.getValue());
             sortedValues.add(result.getValue());
         }
 

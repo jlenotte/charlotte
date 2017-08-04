@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import java.io.FileReader;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import org.apache.flink.api.java.DataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +14,14 @@ public class DataSource
     private final static Logger LOGGER = LoggerFactory.getLogger(DataSource.class.getName());
 
 
-    public ArrayList<Invoice> readFile(String fileName)
+    public ArrayList<Invoice> readFile(DataSet<String> fileName)
     {
         ArrayList<Invoice> list = new ArrayList<>();
         try
         {
             LOGGER.debug("Reading CSV file...");
 
-            CSVReader reader = new CSVReader(new FileReader(fileName), ',');
+            CSVReader reader = new CSVReader(new FileReader(String.valueOf(fileName)), ',');
             String[] nextLine;
 
             while ((nextLine = reader.readNext()) != null)

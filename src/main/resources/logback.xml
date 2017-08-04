@@ -17,7 +17,7 @@
     <appender-ref ref="STDOUT"/>
   </logger>
 
-  <logger name="com.ovh.charlotte.Traitements" level="DEBUG" additivity="false">
+  <logger name="com.ovh.charlotte.Jobs" level="DEBUG" additivity="false">
     <appender-ref ref="STDOUT2"/>
   </logger>
 

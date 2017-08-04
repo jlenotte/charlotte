@@ -1,9 +1,8 @@
 package com.ovh.charlotte;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 
-public class Invoice extends ArrayList<Invoice>
+public class Invoice
 {
 
     // Attributes
@@ -14,7 +13,6 @@ public class Invoice extends ArrayList<Invoice>
     private Double transaction;
 
     // Constructor
-
     Invoice()
     {
         this.name = null;

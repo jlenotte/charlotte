@@ -11,10 +11,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TraitementsTest
+public class JobsTest
 {
 
-    final static Logger LOGGER = LoggerFactory.getLogger(TraitementsTest.class);
+    final static Logger LOGGER = LoggerFactory.getLogger(JobsTest.class);
 
     @Test
     public void getBestCustomerTopOneTest()
@@ -22,7 +22,7 @@ public class TraitementsTest
         try
         {
             // Init
-            Traitements t = new Traitements();
+            Jobs t = new Jobs();
 
             // ***********THE RESULT COMES FROM THE PROCESS**********
             List<Invoice> actual = new ArrayList<>();
@@ -63,7 +63,7 @@ public class TraitementsTest
         try
         {
             // Init
-            Traitements t = new Traitements();
+            Jobs t = new Jobs();
             int amount = 3;
 
             // ***********THE RESULT COMES FROM THE PROCESS**********
