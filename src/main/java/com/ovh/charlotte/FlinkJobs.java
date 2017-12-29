@@ -109,7 +109,7 @@ class FlinkJobs
                 ZonedDateTime date = ZonedDateTime.parse(splitter[4]);
 
                 // assign values to object params
-                Invoice inv = new Invoice(splitter[0], splitter[1], splitter[2], value, date);
+                Invoice inv = new Invoice(splitter[0], splitter[1], splitter[2], splitter[3], value, date);
 
                 return inv;
             })

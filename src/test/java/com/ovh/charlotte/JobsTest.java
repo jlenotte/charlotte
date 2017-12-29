@@ -31,7 +31,7 @@ public class JobsTest
             ZonedDateTime date = ZonedDateTime.parse("2006-11-15T19:44:33.312Z[UTC]");
 
             // Initialize an invoice
-            Invoice inv = new Invoice("lj123123-ovh", "Lenotte", "Jules", 320.00, date);
+            Invoice inv = new Invoice("lj123123-ovh", "Lenotte", "Jules", "basicref", 320.00, date);
 
             // Test that the text format is right
 
@@ -73,8 +73,8 @@ public class JobsTest
             ZonedDateTime date = ZonedDateTime.parse("2006-11-15T19:44:33.312Z[UTC]");
 
             // Initialize an invoice
-            Invoice inv = new Invoice("lj123123-ovh", "Lenotte", "Jules", 320.00, date);
-            Invoice inv2 = new Invoice("aj124124-ovh", "Archibald", "Jean-Celestin", 200.00, date);
+            Invoice inv = new Invoice("lj123123-ovh", "Lenotte", "Jules", "basicref", 320.00, date);
+            Invoice inv2 = new Invoice("aj124124-ovh", "Archibald", "Jean-Celestin", "basicref", 200.00, date);
 
             actual.add(inv);
             actual.add(inv);

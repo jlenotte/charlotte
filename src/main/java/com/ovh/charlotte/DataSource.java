@@ -32,10 +32,11 @@ public class DataSource
                 String nic = nextLine[0];
                 String name = nextLine[1];
                 String firstName = nextLine[2];
-                double transaction = Double.parseDouble(nextLine[3]);
-                ZonedDateTime date = ZonedDateTime.parse(nextLine[4]);
+                String ref = nextLine[3];
+                double transaction = Double.parseDouble(nextLine[4]);
+                ZonedDateTime date = ZonedDateTime.parse(nextLine[5]);
 
-                Invoice c = new Invoice(nic, name, firstName, transaction, date);
+                Invoice c = new Invoice(nic, name, firstName, ref, transaction, date);
                 list.add(c);
             }
             LOGGER.debug("File was read with success.");

@@ -2,105 +2,101 @@ package com.ovh.charlotte;
 
 import java.time.ZonedDateTime;
 
-public class Invoice
-{
+public class Invoice {
 
     // Attributes
     private String nichandle;
     private String name;
     private String firstName;
+    private String productRef;
     private ZonedDateTime date;
     private Double transaction;
 
     // Constructor
-    Invoice()
-    {
+    Invoice() {
         this.name = null;
         this.firstName = null;
         this.nichandle = null;
+        this.productRef = null;
         this.transaction = null;
         this.date = null;
     }
 
-    Invoice(String nichandle, String name, String firstName, Double transaction, ZonedDateTime date)
-    {
+    // Constructor
+    Invoice(String nichandle, String name, String firstName, String productRef, Double transaction, ZonedDateTime date) {
+        this.nichandle = nichandle;
         this.name = name;
         this.firstName = firstName;
-        this.nichandle = nichandle;
+        this.productRef = productRef;
         this.transaction = transaction;
         this.date = date;
     }
 
-    /**
-     * Getters & Setters
-     */
 
-    String getNichandle()
-    {
+    // Getters & Setters
+
+    String getNichandle() {
         return nichandle;
     }
 
-    String getName()
-    {
+    String getName() {
         return name;
     }
 
-    Double getTransaction()
-    {
+    Double getTransaction() {
         return transaction;
     }
 
-    ZonedDateTime getDate()
-    {
+    ZonedDateTime getDate() {
         return date;
     }
 
-    String getFirstName()
-    {
+    String getFirstName() {
         return firstName;
     }
 
-    public void setNichandle(String nichandle)
-    {
+    public String getProductRef() {
+        return productRef;
+    }
+
+    public void setNichandle(String nichandle) {
         this.nichandle = nichandle;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setFirstName(String firstName)
-    {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    public void setDate(ZonedDateTime date)
-    {
+    public void setProductRef(String productRef) {
+        this.productRef = productRef;
+    }
+
+    public void setDate(ZonedDateTime date) {
         this.date = date;
     }
 
-    public void setTransaction(Double transaction)
-    {
+    public void setTransaction(Double transaction) {
         this.transaction = transaction;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "[Client]" + "NicHandle: " + nichandle + " Nom: " + name + ", Prenom: " + firstName
-            + ", Montant: " + transaction
-            + ", Date: " + date + "\n";
+                + ", Reference: " + productRef
+                + ", Montant: " + transaction
+                + ", Date: " + date + "\n";
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return super.hashCode();
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 }
