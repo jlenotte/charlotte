@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-class Jobs
+public class Jobs
 {
 
     final static Logger LOGGER = LoggerFactory.getLogger(Jobs.class);
@@ -26,7 +26,7 @@ class Jobs
      * Return a list of the top N clients
      * @return returnedList
      */
-    List<Invoice> getBestCustomer(List<Invoice> list, int amount) throws IOException
+    public List<Invoice> getBestCustomer(List<Invoice> list, int amount) throws IOException
     {
         // Init variables
         String reportPath = "TOP_CUSTOMER_REPORT.csv";

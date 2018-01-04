@@ -1,5 +1,3 @@
-package com.ovh.charlotte;
-
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -7,6 +5,9 @@ import static org.junit.Assert.fail;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ovh.charlotte.Invoice;
+import com.ovh.charlotte.Jobs;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

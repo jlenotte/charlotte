@@ -23,7 +23,7 @@ public class DataBaseWriter
     private static ArrayList<Invoice> dataList = new ArrayList<Invoice>();
     private final static Logger LOGGER = LoggerFactory.getLogger(DataBaseWriter.class.getName());
 
-    static void dataBaseGeneration()
+    public static void dataBaseGeneration()
     {
         try
         {

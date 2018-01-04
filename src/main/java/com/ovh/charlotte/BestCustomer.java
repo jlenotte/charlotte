@@ -7,22 +7,16 @@ public class BestCustomer
     private String nichandle;
     private String name;
     private String firstName;
+    private String ref;
     private Double transaction;
 
     // Constructor
-    BestCustomer()
-    {
-        this.nichandle = null;
-        this.name = null;
-        this.firstName = null;
-        this.transaction = null;
-    }
-
-    BestCustomer(String nichandle, String name, String firstName, Double transaction)
+    BestCustomer(String nichandle, String name, String firstName, String ref, Double transaction)
     {
         this.nichandle = nichandle;
         this.name = name;
         this.firstName = firstName;
+        this.ref = ref;
         this.transaction = transaction;
     }
 
@@ -31,7 +25,6 @@ public class BestCustomer
     {
         return nichandle;
     }
-
     public String getName()
     {
         return name;
@@ -40,6 +33,10 @@ public class BestCustomer
     public String getFirstName()
     {
         return firstName;
+    }
+
+    public String getRef() {
+        return ref;
     }
 
     public Double getTransaction()
@@ -62,8 +59,23 @@ public class BestCustomer
         this.firstName = firstName;
     }
 
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+
     public void setTransaction(Double transaction)
     {
         this.transaction = transaction;
+    }
+
+    @Override
+    public String toString() {
+        return "BestCustomer{" +
+                "nichandle='" + nichandle + '\'' +
+                ", name='" + name + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", ref='" + ref + '\'' +
+                ", transaction=" + transaction +
+                '}';
     }
 }

@@ -1,6 +1,7 @@
-package com.ovh.charlotte;
-
+import com.ovh.charlotte.DataBaseWriter;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class WritingTest {
 
@@ -8,5 +9,6 @@ public class WritingTest {
     public void dataGenerationTest() {
         DataBaseWriter dbw = new DataBaseWriter();
         dbw.dataBaseGeneration();
+        assertTrue(true);
     }
 }

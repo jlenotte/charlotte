@@ -23,7 +23,7 @@ public class Invoice {
     }
 
     // Constructor
-    Invoice(String nichandle, String name, String firstName, String productRef, Double transaction, ZonedDateTime date) {
+    public Invoice(String nichandle, String name, String firstName, String productRef, Double transaction, ZonedDateTime date) {
         this.nichandle = nichandle;
         this.name = name;
         this.firstName = firstName;

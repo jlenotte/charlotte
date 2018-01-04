@@ -4,90 +4,84 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
+
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.MapOperator;
+import org.apache.flink.api.java.operators.SortPartitionOperator;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-class FlinkJobs
-{
+class FlinkJobs {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(FlinkJobs.class);
 
     /**
      * Return a list of the top N customers
-     *
+     * <p>
      * // Client + transaction /!\
-     *
+     * <p>
      * We need to look at all the transactions that "Mr. Bean" did and sum them into one entry
      * Group the transactions of each customer into one entry
-     *
+     * <p>
      * Sort the list and limit
+     *
      * @return r
      */
-    DataSet<BestCustomer> getBestCustomerFlink(DataSet<String> data, int amount) throws IOException
-    {
+    SortPartitionOperator<Tuple2<String, Double>> getBestCustomerFlink(DataSet<String> data, int amount) throws IOException {
 
         // Convert to object
-        MapOperator<Tuple2<String, Double>, BestCustomer> result = data
-            .map((MapFunction<String, BestCustomer>) s -> {
+        SortPartitionOperator<Tuple2<String, Double>> result = data
+                .map((MapFunction<String, BestCustomer>) s -> {
 
-                String[] splitter = s.split(",");
+                    String[] splitter = s.split(",");
 
-                // parse string to double
-                double value = Double.parseDouble(splitter[3]);
+                    // parse string to double
+                    double value = Double.parseDouble(splitter[4]);
 
-                // assign values to object params
-                BestCustomer customer = new BestCustomer(splitter[0], splitter[1], splitter[2],
-                    value);
+                    // assign values to object params
+                    BestCustomer customer = new BestCustomer(splitter[0], splitter[1], splitter[2], splitter[3],
+                            value);
 
-                return customer;
-            })
-
-            // Group by bestcustomers & reduce
-
-            .groupBy(bestCustomer -> bestCustomer.getNichandle())
-            .reduce(new ReduceFunction<BestCustomer>()
-            {
-                @Override
-                public BestCustomer reduce(BestCustomer bestCustomer, BestCustomer t1)
-                    throws Exception
-                {
-                    return new BestCustomer(bestCustomer.getNichandle(),
-                        bestCustomer.getName(),
-                        bestCustomer.getFirstName(),
-                        bestCustomer.getTransaction() + t1.getTransaction());
-                }
-            })
-
-            // Map to Tuple
-            .map(new MapFunction<BestCustomer, Tuple2<String, Double>>()
-            {
-                @Override
-                public Tuple2<String, Double> map(BestCustomer bestCustomer) throws Exception
-                {
-                    String uid = bestCustomer.getNichandle() + bestCustomer.getName() + bestCustomer
-                        .getFirstName();
-                    Double sum = bestCustomer.getTransaction();
-                    Tuple2<String, Double> tuple = new Tuple2<>(uid, sum);
-                    return tuple;
-                }
-            })
-            .sortPartition(0, Order.DESCENDING)
-            .first(amount)
-            .map(new MapFunction<Tuple2<String, Double>, BestCustomer>()
-            {
-                @Override
-                public BestCustomer map(Tuple2<String, Double> stringDoubleTuple2) throws Exception
-                {
-                    BestCustomer bc = new BestCustomer();
-                    return bc;
-                }
-            });
+                    return customer;
+                })
+                .setParallelism(4)
+                // Group by bestcustomers & reduce
+                .groupBy(bestCustomer -> bestCustomer.getNichandle())
+                .reduce(new ReduceFunction<BestCustomer>() {
+                    @Override
+                    public BestCustomer reduce(BestCustomer bestCustomer, BestCustomer t1)
+                            throws Exception {
+                        return new BestCustomer(bestCustomer.getNichandle(),
+                                bestCustomer.getName(),
+                                bestCustomer.getFirstName(),
+                                bestCustomer.getRef(),
+                                bestCustomer.getTransaction() + t1.getTransaction());
+                    }
+                })
+                .setParallelism(4)
+                // Map to Tuple
+                .map(new MapFunction<BestCustomer, Tuple2<String, Double>>() {
+                    @Override
+                    public Tuple2<String, Double> map(BestCustomer bestCustomer) throws Exception {
+                        String uid = bestCustomer.getNichandle() + bestCustomer.getName() + bestCustomer
+                                .getFirstName();
+                        Double sum = bestCustomer.getTransaction();
+                        Tuple2<String, Double> tuple = new Tuple2<>(uid, sum);
+                        return tuple;
+                    }
+                })
+                .sortPartition(0, Order.DESCENDING)
+                .first(amount)
+                .map(new MapFunction<Tuple2<String, Double>, Tuple2<String, Double>>() {
+                    @Override
+                    public Tuple2<String, Double> map(Tuple2<String, Double> stringDoubleTuple2) throws Exception {
+                        return new Tuple2<String, Double>(stringDoubleTuple2.f0, stringDoubleTuple2.f1);
+                    }
+                }).setParallelism(4)
+                .sortPartition(1, Order.DESCENDING);
 
         return result;
     }
@@ -95,32 +89,29 @@ class FlinkJobs
     /**
      * Display the list with flink
      */
-    static void displayContent(DataSet<String> text)
-    {
+    static void displayContent(DataSet<String> text) {
         text
-            .map((MapFunction<String, Invoice>) s -> {
+                .map((MapFunction<String, Invoice>) s -> {
 
-                String[] splitter = s.split(",");
+                    String[] splitter = s.split(",");
 
-                // parse string to double
-                double value = Double.parseDouble(splitter[3]);
+                    // parse string to double
+                    double value = Double.parseDouble(splitter[3]);
 
-                // parse string to zdate
-                ZonedDateTime date = ZonedDateTime.parse(splitter[4]);
+                    // parse string to zdate
+                    ZonedDateTime date = ZonedDateTime.parse(splitter[4]);
 
-                // assign values to object params
-                Invoice inv = new Invoice(splitter[0], splitter[1], splitter[2], splitter[3], value, date);
+                    // assign values to object params
+                    Invoice inv = new Invoice(splitter[0], splitter[1], splitter[2], splitter[3], value, date);
 
-                return inv;
-            })
-            .map(new MapFunction<Invoice, String>()
-            {
-                @Override
-                public String map(Invoice invoice) throws Exception
-                {
-                    return invoice.toString();
-                }
-            }).writeAsText("/tmp/fffuuuuuu"); // once the collect is done, the process stops
+                    return inv;
+                })
+                .map(new MapFunction<Invoice, String>() {
+                    @Override
+                    public String map(Invoice invoice) throws Exception {
+                        return invoice.toString();
+                    }
+                }).writeAsText("/tmp/fffuuuuuu"); // once the collect is done, the process stops
     }
 
     /**
@@ -128,8 +119,7 @@ class FlinkJobs
      *
      * @return List of doubles
      */
-    void getTotalPerMonthFlink(DataSet<String> text) throws IOException
-    {
+    void getTotalPerMonthFlink(DataSet<String> text) throws IOException {
         // read all transactions and sum them for each month
 
     }
@@ -138,8 +128,7 @@ class FlinkJobs
     /**
      * Get top 10 months ever made
      */
-    List<Double> getTopTenMonthsFlink(List<Invoice> list) throws IOException
-    {
+    List<Double> getTopTenMonthsFlink(List<Invoice> list) throws IOException {
         return null;
     }
 
@@ -151,8 +140,7 @@ class FlinkJobs
      * @return returns a List<> of Invoices
      * @throws IOException IOException
      */
-    List<Invoice> getTotalPerYearPerCustomerFlink(List<Invoice> list) throws IOException
-    {
+    List<Invoice> getTotalPerYearPerCustomerFlink(List<Invoice> list) throws IOException {
         // Stream & filter the list into a sum
         return null;
     }
@@ -166,8 +154,7 @@ class FlinkJobs
      * @throws IOException IOException
      */
     HashMap<String, Double> getTotalPerYearFlink(List<Invoice> list, HashMap<String, Double> hm)
-        throws IOException
-    {
+            throws IOException {
         return null;
     }
 }
